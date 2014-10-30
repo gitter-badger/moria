@@ -51,7 +51,7 @@ function decorateModule( module, setup ){
 				fn.apply( module, args );
 			} );
 
-			return construct( module, args );
+			return construct( module.controller, args );
 		},
 		view       : module.view
 	};
