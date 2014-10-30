@@ -16,10 +16,10 @@ module.exports = function buildRouteHash( routeMap ){
 				}
 			}
 			else if( props.subMap ){
-				buildLevel( props.subMap, props.path, props.setup );
+				buildRouteLevel( props.subMap, props.path, props.setup );
 			}
 		} );
-	}( routeMap, empty, [] );
+	}( routeMap, '', [] );
 
 	return hash;
 };
@@ -43,11 +43,13 @@ function routeProps( value, key, tail, before ){
 function decorateModule( module, setup ){
 	return {
 		controller : function controllerDecorator(){
+			var args = _.toArray( args );
+
 			_.each( setup, function executeSetup( fn ){
 				fn.apply( module, args );
 			} );
 
-			return construct( module, arguments );
+			return construct( module, args );
 		},
 		view       : module.view
 	};
@@ -68,7 +70,6 @@ var construct = ( function metaConstructorFacade(){
 		return new ( bind.apply( 
 			Constructor, 
 			_( args )
-				.toArray()
 				.concat( Constructor )
 				.reverse()
 				.valueOf() 
@@ -80,6 +81,6 @@ var construct = ( function metaConstructorFacade(){
 
 		Reconstruction.prototype = Constructor.prototype;
 
-		return new Reconstruction( _.toArray( args ) );
+		return new Reconstruction( args );
 	};
 }() );

@@ -1,6 +1,6 @@
 {
   "name": "moria",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "A routing system for Mithril",
   "main": "moria.js",
   "scripts": {
