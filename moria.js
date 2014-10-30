@@ -1,6 +1,10 @@
 'use strict';
 
 var _ = require( 'lodash' );
+var m = require( 'mithril' );
+
+var empty = '';
+var slash = '/';
 
 module.exports = function buildRouteHash( routeMap ){
 	var hash = {};
@@ -9,7 +13,10 @@ module.exports = function buildRouteHash( routeMap ){
 		_.each( routeMap, function buildRoute( value, key ){
 			var props = routeProps( value, key, tail, before );
 
-			if( props.module ){
+			if( props.redirect ){
+				hash[ props.path ] = redirect( props.outcome, props.path );
+			} 
+			else if( props.module ){
 				if( props.setup.length ){
 					hash[ props.path ] = decorateModule( props.module, props.setup );
 				}
@@ -21,7 +28,7 @@ module.exports = function buildRouteHash( routeMap ){
 				buildRouteLevel( props.subMap, props.path, props.setup );
 			}
 		} );
-	}( routeMap, '', [] );
+	}( routeMap, empty, [] );
 
 	return hash;
 };
@@ -29,18 +36,56 @@ module.exports = function buildRouteHash( routeMap ){
 function routeProps( value, key, tail, before ){
 	var output = {};
 
-	var prefix  = ( key || !tail ) ? '/' : '';
+	var prefix  = ( key || !tail ) ? slash : empty;
 	var segment = prefix + key;
 	var outcome = _.isArray( value ) && value.pop() || value;
 
-
-	output.path   = tail + segment;
-	output.setup  = _.isArray( value ) ? before.concat( value ) : before;
-	output.module = isModule( outcome ) && outcome;
-	output.subMap = !output.module && _.isPlainObject( outcome ) && outcome;
+	output.path     = tail + segment;
+	output.setup    = _.isArray( value ) ? before.concat( value ) : before;
+	output.module   = isModule( outcome ) && outcome;
+	output.subMap   = !output.module && _.isPlainObject( outcome ) && outcome;
+	output.redirect = _.isString( outcome );
 
 	return output;
 }
+
+var redirect = ( function redirectScope(){
+	var absolute   = /^\//;
+	var ascend     = /^\.\.\//;
+	var tail       = /[^\/]+\/?$/;
+	var paramToken = /:([^\/]+)(\.\.\.)?/g;
+	var emptyView  = function(){};
+
+	function complete( to, from ){
+		if( absolute.test( to ) ){
+			return to;
+		}
+		while( ascend.test( to ) ){
+			from = from.replace( tail, empty );
+		}
+
+		return from + to;
+	}
+
+	return function redirect( to, from ){
+		var path = complete( to, from );
+
+		return {
+			controller : function redirection(){
+				var endpoint = to.replace( paramToken, function insertParam( token, param ){
+					return m.route.param( param );
+				} );
+
+				m.startComputation();
+
+				m.route( endpoint );
+
+				m.endComputation();
+			},
+			view       : emptyView
+		};
+	};
+}() ); 
 
 function decorateModule( module, setup ){
 	return {
