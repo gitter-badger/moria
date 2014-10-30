@@ -1,3 +1,5 @@
+'use strict';
+
 var _ = require( 'lodash' );
 
 module.exports = function buildRouteHash( routeMap ){
@@ -29,7 +31,7 @@ function routeProps( value, key, tail, before ){
 
 	var prefix  = ( key || !tail ) ? '/' : '';
 	var segment = prefix + key;
-	var outcome = _.isArray( value ) && value.unshift() || value;
+	var outcome = _.isArray( value ) && value.pop() || value;
 
 
 	output.path   = tail + segment;
