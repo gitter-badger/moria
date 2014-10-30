@@ -1,0 +1,27 @@
+{
+  "name": "moria",
+  "version": "0.0.1",
+  "description": "A routing system for Mithril",
+  "main": "moria.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/barneycarroll/moria.git"
+  },
+  "keywords": [
+    "mithril",
+    "router",
+    "routing"
+  ],
+  "author": "barney.carroll@gmail.com",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/barneycarroll/moria/issues"
+  },
+  "homepage": "https://github.com/barneycarroll/moria",
+  "dependencies": {
+    "lodash": "^2.4.1"
+  }
+}
