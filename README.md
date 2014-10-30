@@ -11,10 +11,10 @@ Moria aims to solve these problems by producing a Mithril-compatible route hash 
 
 * Nested routes
 * Setup functions to run when a route is matched
+* Redirects
 
 # Roadmap
 
-* Redirects
 * Nested modules (currently, each route endpointmust specify the complete module structure you want to render)
 * ...
 
@@ -32,7 +32,8 @@ npm install --save moria
 var moria = require( 'moria' );
 
 var routeHash = moria( {
-  ''          : loginModule,            // Results in '/loginModule'
+  ''          : loginModule,            // Results in '/loginModule',
+  'search'    : '../shop/search',       // Redirect '/search' to '/shop/search'
   'shop'      : {
     ''         : browseModule,          // Results in '/shop'
     'search'   : searchModule,
@@ -51,6 +52,7 @@ var routeHash = moria( {
   'admin'     : [
     initAdminModel,                     // Another setup function
     {
+      ''      : 'users',                // Redirect '/admin' to '/admin/users'
       'users' : [                       // When route matches '/admin/users'...
         initUsersModel,                 // Run initAdminModel && initUserModel...
         {

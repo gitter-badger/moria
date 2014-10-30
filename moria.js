@@ -14,7 +14,7 @@ module.exports = function buildRouteHash( routeMap ){
 			var props = routeProps( value, key, tail, before );
 
 			if( props.redirect ){
-				hash[ props.path ] = redirect( props.outcome, props.path );
+				hash[ props.path ] = redirect( props.path, props.redirect );
 			} 
 			else if( props.module ){
 				if( props.setup.length ){
@@ -44,7 +44,7 @@ function routeProps( value, key, tail, before ){
 	output.setup    = _.isArray( value ) ? before.concat( value ) : before;
 	output.module   = isModule( outcome ) && outcome;
 	output.subMap   = !output.module && _.isPlainObject( outcome ) && outcome;
-	output.redirect = _.isString( outcome );
+	output.redirect = _.isString( outcome ) && outcome;
 
 	return output;
 }
@@ -56,19 +56,16 @@ var redirect = ( function redirectScope(){
 	var paramToken = /:([^\/]+)(\.\.\.)?/g;
 	var emptyView  = function(){};
 
-	function complete( to, from ){
-		if( absolute.test( to ) ){
-			return to;
-		}
-		while( ascend.test( to ) ){
-			from = from.replace( tail, empty );
-		}
+	return function redirect( from, to ){
+		if( !absolute.test( to ) ){
+			while( ascend.test( to ) ){
+				to.replace( ascend. empty );
 
-		return from + to;
-	}
+				from = from.replace( tail, empty );
+			}
 
-	return function redirect( to, from ){
-		var path = complete( to, from );
+			to = from + slash + to;
+		}
 
 		return {
 			controller : function redirection(){
@@ -106,7 +103,7 @@ var isModule = ( function propsContainer(){
 	var props = [ 'controller', 'view' ];
 
 	return function isModule( x ){
-		return _( x ).omit( props ).isEmpty() && _( x ).pick( props ).every( _.isFunction );
+		return _.isPlainObject( x ) && _( x ).omit( props ).isEmpty() && _( x ).pick( props ).every( _.isFunction );
 	};
 }() );
 
